@@ -13,7 +13,7 @@ import (
 
     "go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/bson"
-    "go.mongodb.org/mongo-driver/bson/primitive"
+    //"go.mongodb.org/mongo-driver/bson/primitive"
     //"go.mongodb.org/mongo-driver/mongo/options"
     //"go.mongodb.org/mongo-driver/mongo/readpref"
 )
@@ -29,12 +29,14 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     var meeting models.Meeting
 
-    err := json.Decoder(r.Body).Decode(&meeting)
+    err := json.NewDecoder(r.Body).Decode(&meeting)
 
-    meeting.ID = primitive.NewObjectIDFromTimestamp
+    meeting.ID = helper.GetID(32)
     meeting.CreatedAt = time.Now().Unix()
+    fmt.Println("Meeting title- ", meeting.Title)
 
     if err != nil {
+        fmt.Println(err.Error())
         http.Error(w, "Invalid Request Body", http.StatusBadRequest)
         return
     }
@@ -45,7 +47,7 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
 
     emails := make(bson.A, len(meeting.Participants))
     for i := 0; i < len(meeting.Participants); i++ {
-        emails[i] = meeting.Participant[i].Email
+        emails[i] = meeting.Participants[i].Email
 
         _, found := helper.Find([]string{"Yes", "No", "Maybe", "Not Answered"}, meeting.Participants[i].RSVP)
         if !found {
@@ -70,7 +72,7 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
     }}
 
     check_time_stage := bson.D{{
-        "$match": bson.M{
+        "$match", bson.M{
             "$or": bson.A{
                 bson.M{
                     "startTime": bson.M{"$lte": meeting.EndTime},
@@ -88,7 +90,7 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
         },
     }}
 
-    var dbase = models.db
+    var dbase = models.ConnectDB()
     var meetingCollection = dbase.Collection("meetings")
     meetingCursor, err := meetingCollection.Aggregate(context.TODO(), mongo.Pipeline{unwind_stage, match_stage, check_time_stage})
 
