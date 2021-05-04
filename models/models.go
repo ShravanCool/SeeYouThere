@@ -1,8 +1,8 @@
 package models
 
-//import (
-    //"go.mongodb.org/mongo-driver/bson/primitive"
-//)
+import (
+    "go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Participant struct {
     Name string `json:"name" bson:"name"`
@@ -11,7 +11,7 @@ type Participant struct {
 }
 
 type Meeting struct {
-    ID string `json:"id" bson:"id"`
+    ID primitive.NewObjectIDFromTimestamp `json:"id" bson:"id"`
     Title string `json:"title" bson:"title"`
     Participants []Participant `json:"participants" bson:"participants"`
     StartTime int64 `json:"startTime" bson:"startTime"`
