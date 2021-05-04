@@ -18,11 +18,11 @@ import (
     //"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func apiStatus(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(`{"message": "Server is up and running.."}`))
-}
+//func apiStatus(w http.ResponseWriter, r *http.Request) {
+    //w.Header().Set("Content-Type", "application/json")
+    //w.WriteHeader(http.StatusOK)
+    //w.Write([]byte(`{"message": "Server is up and running.."}`))
+//}
 
 func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
     //fmt.Println("Post method to add or schedule a meeting")
@@ -116,7 +116,7 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMeetingByID(w http.ResponseWriter, r *http.Request) {
-    id := helper.getParams(r)
+    id := helper.GetParams(r)
 
     var meeting bson.M
 
@@ -138,9 +138,9 @@ func GetMeetingByID(w http.ResponseWriter, r *http.Request) {
 
 func main() {
     fmt.Println("Hello World!!")
-    http.HandleFunc("/", apiStatus)
+    //http.HandleFunc("/", apiStatus)
     http.HandleFunc("/meetings", MeetingSchedule)
-    http.HandleFunc("/meeting", GetMeetingByID)
+    http.HandleFunc("/meeting/", GetMeetingByID)
     err := http.ListenAndServe(":8080", nil)
     if err != nil {
         panic(err)
