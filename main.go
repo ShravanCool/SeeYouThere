@@ -115,10 +115,32 @@ func MeetingSchedule(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(meeting)
 }
 
+func GetMeetingByID(w http.ResponseWriter, r *http.Request) {
+    id := helper.getParams(r)
+
+    var meeting bson.M
+
+    var dbase = models.ConnectDB()
+    var meetingCollection = dbase.Collection("meetings")
+
+    err := meetingCollection.FindOne(context.TODO(), bson.D{{
+        "id", id,
+    }}).Decode(&meeting)
+
+    if err != nil {
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        panic(err)
+    }
+
+    json.NewEncoder(w).Encode(meeting)
+
+}
+
 func main() {
     fmt.Println("Hello World!!")
     http.HandleFunc("/", apiStatus)
     http.HandleFunc("/meetings", MeetingSchedule)
+    http.HandleFunc("/meeting", GetMeetingByID)
     err := http.ListenAndServe(":8080", nil)
     if err != nil {
         panic(err)
