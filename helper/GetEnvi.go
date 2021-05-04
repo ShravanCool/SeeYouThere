@@ -2,6 +2,7 @@ package helper
 
 import (
     "log"
+    "os"
 
     "github.com/joho/godotenv"
 
@@ -12,7 +13,6 @@ func GetEnvi (key string) string {
 
     if err != nil {
         log.Fatal("Error loading the .env file")
-        return nil
     }
     return os.Getenv(key)
 }
